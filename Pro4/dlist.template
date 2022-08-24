@@ -1,0 +1,219 @@
+/**
+ * @file dlist.template
+ * @author Keegan Goecke
+ * @brief Template file for dlist.h
+ * @version 0.1
+ * @date 2022-03-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+#include <iostream>
+using namespace std;
+
+// constuctor
+template<class T>
+dlist<T>::dlist(){
+    head = tail = NULL; // sets head and tail to null
+}
+
+// BIG THREE
+template<class T>
+dlist<T>::~dlist(){
+    dnode<T> *tmp;   // node tmp
+    while(head != NULL){    // checks if head is null
+        tmp = head;     // sets tmp to head
+        head = head -> next();  // moves head to head next
+        delete tmp;     // deletes tmp
+    }
+}
+
+template<class T>
+dlist<T>::dlist(const dlist<T> &other){
+    dnode<T> *tmp = other.head;  // node tmp set to other.head
+    head = NULL;    // sets head to null
+    tail = head;    // sets tail to head
+    while(tmp != NULL){ // loops until null
+        rear_insert(tmp -> data()); //iserts tmp data at the rear of list
+        tmp = tmp -> next();    // moves tmp over one
+    }
+}
+
+template<class T>
+void dlist<T>::operator = (const dlist<T> &other){
+    if(this == &other){ // checks if this equals &other
+        return; // return if true
+    }else{
+        dnode<T> *tmp;   // creates tmp
+        while(head != NULL){    // loops through list
+            tmp = head; // sets tmp to head
+            head = head -> next();  // moves head over one
+            delete tmp; // deletes tmp
+        }
+        tmp = other.head;   // sets tmp = to other.head
+        if(tmp == NULL){    // checks if tmp is NULL
+            head = NULL;    // sets head to null
+            tail = head;    // sets tail to head
+        }else{
+            while(tmp != NULL){ // loops until null
+                rear_insert(tmp -> data()); // inserts tmp data at end of list
+                tmp = tmp -> next();    // moves tmp over one 
+            }
+        }
+    }
+}
+
+// List functions
+template<class T>
+void dlist<T>::rear_insert(T item){
+    dnode<T> *tmp = new dnode<T>(item); // new node tmp with data set as item
+    if(head == NULL){   // checks if head is null
+        head = tmp;    // sets head to tmp
+        tail = tmp;    // sets tail to tmp
+    }else{
+        tmp->set_previous(tail);    // sets tmp previous to tail
+        tail->set_next(tmp);    // sets tail next to tmp
+        tail = tmp; // sets ttail to = tmp
+    }
+}
+
+template<class T>
+void dlist<T>::front_insert(T item){
+    dnode<T> *tmp = new dnode<T>(item);  // new ode tmp with data set to item
+    if(head == NULL){   // check if head is null
+        head = tmp; // sets head to tmp
+        tail = tmp; // sets tail to tmp
+    }else{
+        tmp->set_next(head);    // sets tmp next to head
+        head->set_previous(tmp);    // sets head previous to tmp
+        head = tmp; // sets head to tmp
+    }  
+}
+
+template<class T>
+void dlist<T>::front_remove(){
+    if(head == NULL){    // check ifhead is null
+        cout << "List is empty" << endl;    // error message
+    }else{
+        dnode<T> *tmp = head;   // new node tmp set to head
+        head = head->next();    // moves head over one place
+        if(head == NULL){   // check if head is null
+            tail = NULL;    // sets tail to null
+        }else{
+            head->set_previous(NULL);   // sets head previous to null
+        }
+        delete tmp;    // deletes tmp
+    }
+
+}
+
+template<class T>
+void dlist<T>::rear_remove(){
+    if(head == NULL){   // checks if head is null
+        cout << "List is empty" << endl;    // error message
+    }else{
+        dnode<T> *tmp = tail;   // new node tmp set to tail
+        tail = tail->previous();    // moves tail back one place
+        if(tail == NULL){   // check if tail is null
+            head = NULL;    // sets head to null
+        }else{
+            tail->set_next(NULL);   // sets tail next to null
+        }
+        delete tmp;    // deletes tmp
+    }
+}
+
+template<class T>
+void dlist<T>::show(){
+    dnode<T> *tmp = head;    // new node tmp set to head
+    if(tmp == NULL){    // checks if tmp is null
+        cout << "ERROR: empty list." << endl;   // error message
+    }else{
+        while(tmp != NULL){ // loops until tmp is null
+            cout << tmp -> data() << endl;  // outputs tmp data
+            tmp = tmp -> next();    // moves tmp over one
+        }
+    }
+}
+
+template<class T>
+int dlist<T>::size(){
+    int counter = 0;    // counter for size
+    if(head == NULL){   // checks if head is null
+        cout << "ERROR: empty list." << endl;   // error message
+    }else{
+        dnode<T> *tmp = head;    // new node tmp set to head
+        while(tmp != NULL){ // loops until null
+            tmp = tmp -> next();    // shifts tmp over one
+            counter++;  // updates counter
+        }
+    }
+    return counter; // returns counter
+}
+
+// iterator functions
+
+template<class T>
+void dlist<T>::remove(iterator it){
+    dnode<T> *tmp = it.current;  // new node tmp set to current
+    if(head == NULL || tmp == NULL){    // checks if head or tmp is null
+        cout << "ERROR: empty list" << endl;    // error message
+    }else if(head == tmp){  // checks if head is equal to tmp
+        front_remove(); // removes first node
+    }else if(tail == tmp){  // checks if tail is equal to tmp
+        rear_remove();  // removes rear node
+    }else{
+        tmp->previous()->set_next(tmp->next()); // sets tmp previous next to tmp next
+        tmp->next()->set_previous(tmp->previous()); // sets tmp next previous to tmp previous
+        delete tmp; // deletes tmp
+    }
+}
+
+template<class T>
+void dlist<T>::insert_before(iterator it, T item){
+dnode<T>* tmp = it.current; // new node tmp set to current
+  if(head == NULL || head == tmp){  // checks if head == null or head is == to tmp
+    front_insert(item); // inserts item at front of list
+  }
+  else{
+    dnode<T> *nw;    
+    nw = new dnode<T>(item, NULL, NULL); // new node node with both pointer set to null
+    nw -> set_previous(tmp -> previous());  // sets nw previous to tmp previous
+    nw -> set_next(tmp);    // sets nw next to tmp
+    tmp -> previous() -> set_next(nw);  // sets tmp previous to next to nw
+    tmp -> set_previous(nw);    // sets tmp prvious to nw
+  } 	
+}
+
+template<class T>
+void dlist<T>::insert_after(iterator it, T item){
+    dnode<T>* tmp = it.current;  // tmp set to current
+    
+    if(head == NULL){   // checks if head is null
+        front_insert(item); // inserts item at front
+    }else if(tail == tmp){  // checks if tail equals tmp
+        rear_insert(item);  // inserts item at end
+    }else{
+        dnode<T> *nw;    // node nw
+        nw = new dnode<T>(item, NULL, NULL); // nw is new node with both pointers set to null
+        nw -> set_next(tmp -> next());  // sets nw next to tmp next
+        nw -> set_previous(tmp);    // sets nw previous to tmp
+        tmp -> next() -> set_previous(nw);  // sets tmp next previous to nw
+        tmp -> set_next(nw);    // sets tmp next to nw
+    }
+    
+}
+
+template<class T>
+void dlist<T>::reverse_show(){
+    if(head == NULL){   // checks if head is null
+        cout << "ERROR: empty list." << endl;   // error message
+    }else{
+        dnode<T> *tmp = tail;    // tmp set to tail
+        while(tmp != NULL){ // loops until null
+            cout << tmp -> data() << endl;  // outputs data of tmp
+            tmp = tmp -> previous();    // moves tmp back one
+        }
+    }
+}

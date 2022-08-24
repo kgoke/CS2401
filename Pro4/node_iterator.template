@@ -1,0 +1,49 @@
+
+#include <iostream>
+#include "node_iterator.h"
+using namespace std;
+
+template<class T>
+bool dnode_iterator<T>::operator!=(dnode_iterator<T> other)const{
+    return current != other.current;    // checks if current is not equal to other.current
+}
+
+template<class T>
+bool dnode_iterator<T>::operator==(dnode_iterator<T> other)const{
+    return current == other.current;    // checks if current equals other.current
+}
+
+
+template<class T>
+T dnode_iterator<T>::operator*()const{
+    return current -> data();   // returns currents data
+}
+
+//prefix
+template<class T>
+dnode_iterator<T> dnode_iterator<T>::operator++(){
+    current = current -> next();    // moves current to next
+    return *this;   // returns next
+}
+
+//postfix
+template<class T>
+dnode_iterator<T> dnode_iterator<T>::operator++(int){
+    dnode_iterator<T> original(*this);   // node iterator original set to *this
+    current = current -> next();    // shifts current over one
+    return original;    // returns original
+}
+
+template<class T>
+dnode_iterator<T> dnode_iterator<T>::operator--(){
+    current = current -> previous();    // oves current back one
+    return *this;   // returns previous
+}
+
+template<class T>
+dnode_iterator<T> dnode_iterator<T>::operator--(int){
+    dnode_iterator<T> original(*this);   // node iterator set to *this
+    current = current -> previous();    // moves current back one
+    return original;    // returns original
+}
+
