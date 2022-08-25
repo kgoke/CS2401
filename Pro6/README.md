@@ -9,4 +9,3 @@ To play the game follow the steps below:
 4. Run the ./a.exe or ./a.out file 
 
 5. Enjoy!!
-6. 
